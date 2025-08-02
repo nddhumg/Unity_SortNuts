@@ -1,11 +1,6 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-
-using UnityEngine.AddressableAssets;
-using UnityEngine.ResourceManagement.AsyncOperations;
-using static UnityEngine.Rendering.VirtualTexturing.Debugging;
 public class GameCtrl : Singleton<GameCtrl>
 {
     [SerializeField] private Nut nutSelect;
@@ -90,7 +85,7 @@ public class GameCtrl : Singleton<GameCtrl>
         }
         if (tubeSelect == tubeLast)
         {
-            nutSelect.Push(tubeLast);
+            nutSelect.Revert();
             nutSelect = null;
             tubeSelect = null;
             return;
