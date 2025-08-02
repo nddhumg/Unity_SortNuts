@@ -7,15 +7,15 @@ public class SOConfigGame : ScriptableObject
 {
     [SerializeField] private float nutHeight;
     [SerializeField] private int maxNutInTube;
-    [SerializeField] private Vector3 positionNutPop;
-    [SerializeField] private Vector3 positionNutZero;
+    [SerializeField] private float positionYNutPop;
+    [SerializeField] private float positionYNutZero;
     [SerializeField] private List<ColorNut> color;
     [SerializeField] private Material materialColorHidden;
     public float NutHeight => nutHeight;
     public int MaxNutInTube => maxNutInTube;
 
-    public Vector3 PositionNutPop => positionNutPop;
-    public Vector3 PositionNutZero => positionNutZero;
+    public float PositionYNutPop => positionYNutPop;
+    public float PositionYNutZero => positionYNutZero;
     public Material GetMaterial(ColorEnum colorEnum)
     {
         return color.Find(c => c.enumColor == colorEnum).material;

@@ -97,7 +97,8 @@ public class RenderLevel : MonoBehaviour
                 tubeGO.transform.localPosition = posiitionSpawn;
                 posiitionSpawn.x += size.x + spacing.x;
                 index++;
-                result.Add(tubeGO.GetComponent<Tube>());
+                Tube tubeScript = tubeGO.GetComponent<Tube>();
+                result.Add(tubeScript);
             }
             posiitionSpawn.z += size.y + spacing.y + verticalDeviation * column;
             posiitionSpawn.x = boundLeftRight.x + size.x / 2;
@@ -127,7 +128,8 @@ public class RenderLevel : MonoBehaviour
         MakeHiddenNut(tubeRenders);
         for (int indexTubeRender = 0; indexTubeRender < tubeRenders.Count; indexTubeRender++)
         {
-            positionNutCurrent = configGame.PositionNutZero;
+            positionNutCurrent = tube.transform.position;
+            positionNutCurrent.y = configGame.PositionYNutZero;
             List<NutRender> nutRendersList = tubeRenders[indexTubeRender].nuts.ToList();
             nutRendersList.Reverse();
             foreach (NutRender nutRender in nutRendersList)

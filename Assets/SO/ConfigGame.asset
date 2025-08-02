@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   nutHeight: 0.35
   maxNutInTube: 4
-  positionNutPop: {x: 0, y: 0.592, z: 0}
-  positionNutZero: {x: 0, y: -0.25, z: 0}
+  positionYNutPop: 0.36
+  positionYNutZero: -0.44
   color:
   - enumColor: 0
     material: {fileID: 2100000, guid: 4e86436d041bb0740a1c26fc69d53f09, type: 2}

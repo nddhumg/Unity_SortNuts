@@ -80,12 +80,12 @@ public class GameCtrl : Singleton<GameCtrl>
         {
             nutSelect = tubeSelect.PeekNuts();
             tubeLast = tubeSelect;
-            nutSelect?.Pop();
+            nutSelect?.PopAnimation();
             return;
         }
         if (tubeSelect == tubeLast)
         {
-            nutSelect.Revert();
+            nutSelect.RevertAnimation();
             nutSelect = null;
             tubeSelect = null;
             return;
@@ -96,8 +96,10 @@ public class GameCtrl : Singleton<GameCtrl>
             Debug.Log("Dont push");
             return;
         }
-        tubeLast.PopNut();
-        nutSelect.Push(tubeSelect);
         nutSelect = null;
+    }
+
+    private void SelectTubeTemp(Tube tubeSelect) {
+        
     }
 }
