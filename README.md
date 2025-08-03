@@ -3,12 +3,12 @@ Sort Nuts là một trò chơi xếp hạt theo màu sắc vào các ống. Ngư
 
 🎮 Gameplay demo
 
-[Đoạn video này trình bày cách người chơi tương tác với các ống và hạt](https://youtu.be/wwvhZojdd0g)
+![Demo Gameplay](Gif/0803.gif)
 
 ⚙️ Hệ thống tự động tạo màn chơi (Auto Level Generator)
 
 Hệ thống này cho phép tạo màn chơi một cách tự động dựa trên các quy tắc tùy chỉnh như số lượng ống, màu sắc, độ khó,… giúp bạn dễ dàng mở rộng game về sau.
-[Đoạn video này mô tả hệ thống tự sinh](https://youtu.be/GWRLLmNcwEI)
+![Demo Gameplay](Gif/spawn.gif)
 🔧 Tính năng chính
 Hệ thống sắp xếp hạt logic đơn giản nhưng gây nghiện
 
