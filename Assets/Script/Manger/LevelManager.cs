@@ -14,6 +14,8 @@ public class LevelManager
     private bool isFinalLevel = false;
 
     public MapData MapCurrentData => mapCurrentData;
+
+    public GameObject MapCurrent => handleCurrent.Result;
     public int LevelCurrent => levelCurrent;
     public bool IsFinishLevel => isFinalLevel;
     public Action OnNextMap;
@@ -78,6 +80,8 @@ public class LevelManager
 
     private void ActivateMap(AsyncOperationHandle<GameObject> handle)
     {
+        if (!handle.IsValid())
+            return;
         handle.Result.SetActive(true);
         mapCurrentData = handle.Result.GetComponent<MapData>();
         OnNextMap?.Invoke();

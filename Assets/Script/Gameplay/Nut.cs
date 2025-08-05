@@ -1,17 +1,19 @@
+using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Collections;
+using UnityEditor;
 using UnityEngine;
-using DG.Tweening;
+using UnityEngine.Serialization;
 
 public class Nut : MonoBehaviour
 {
-    private Tube tube;
-    [SerializeField] private ColorEnum colorName;
-    [SerializeField] private Renderer render;
-    [SerializeField] private GameObject textHidden;
-    [SerializeField, ReadOnly] private bool isHidden;
-    [SerializeField] private Material colorMaterial;
+    [SerializeField] private Tube tube;
+    [SerializeField, FormerlySerializedAs("color")] private ColorEnum colorName;
+    [SerializeField, FormerlySerializedAs("render")] private Renderer render;
+    [SerializeField, FormerlySerializedAs("textHidden")] private GameObject textHidden;
+    [SerializeField, ReadOnly, FormerlySerializedAs("isHidden")] private bool isHidden;
+    [SerializeField, FormerlySerializedAs("materialColor")] private Material colorMaterial;
     public ColorEnum ColorName => colorName;
     public bool IsHidden => isHidden;
 
@@ -20,11 +22,36 @@ public class Nut : MonoBehaviour
         return tube;
     }
 
-    public void SetColor(ColorEnum colorName, Material colorMaterial)
+    public void Init(Tube tube) { 
+        this.tube = tube;
+
+#if UNITY_EDITOR
+        EditorUtility.SetDirty(this);
+#endif
+    }
+
+    public void SetColor(ColorEnum colorName, Material colorMaterial, bool isChange = true)
     {
-        this.colorName = colorName;
+        if (isChange)
+        {
+            this.colorName = colorName;
+            this.colorMaterial = colorMaterial;
+        }
         render.material = colorMaterial;
-        this.colorMaterial = colorMaterial;
+    }
+
+    public void SetColor(Material colorMaterial)
+    {
+        render.material = colorMaterial;
+    }
+
+
+    public void ResetColor()
+    {
+        if(!isHidden)
+            render.material = colorMaterial;
+        else
+            render.material = GameMode.instance.HiddenMaterial; 
     }
 
     public void SetupHidden(bool isHidden, Material colorHidden)

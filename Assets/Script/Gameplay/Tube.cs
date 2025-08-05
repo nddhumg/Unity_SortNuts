@@ -1,12 +1,15 @@
+using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
+using UnityEditor;
 using UnityEngine;
-using DG.Tweening;
 
 public class Tube : MonoBehaviour
 {
     private Stack<Nut> nuts = new();
+    [SerializeField] private List<Nut> nutsList;
     [SerializeField] private SOConfigGame gameConfig;
     [SerializeField] private Transform nutsParent;
     private Vector3 positionPush;
@@ -15,7 +18,7 @@ public class Tube : MonoBehaviour
 
     public Transform NutsParent => nutsParent;
     public Vector3 PositionPop { get => positionPop; }
-    public Vector3 PositionPush { get => positionPush;}
+    public Vector3 PositionPush { get => positionPush; }
 
     public int CountNuts => nuts.Count;
 
@@ -28,16 +31,32 @@ public class Tube : MonoBehaviour
         positionPop.y = gameConfig.PositionYNutPop;
 
         positionPush = positionNutZero;
-        foreach (Transform nutGO in nutsParent)
+        foreach (Nut nut in nutsList)
         {
-            Nut nut = nutGO.GetComponent<Nut>();
             nuts.Push(nut);
-            nut.SetTubeCurrent(this);
-            nutGO.position = positionPush;
+            nut.transform.position = positionPush;
             positionPush.y += gameConfig.NutHeight / 2;
         }
         if (nuts.Count != 0)
             positionPush.y -= gameConfig.NutHeight / 2;
+    }
+
+    public void ListRemoveNut(Nut nutRemove)
+    {
+        nutsList.Remove(nutRemove);
+        positionNutZero = transform.position;
+        positionNutZero.y = gameConfig.PositionYNutZero;
+        positionPush = positionNutZero;
+        foreach (Nut nut in nutsList)
+        {
+            nut.transform.position = positionPush;
+            positionPush.y += gameConfig.NutHeight / 2;
+        }
+    }
+
+    public void ListAddNut(Nut nut)
+    {
+        nutsList.Add(nut);
     }
 
     public Nut PeekNuts()
@@ -75,9 +94,9 @@ public class Tube : MonoBehaviour
             }
             nuts.Push(nut);
             tubeLast.PopNut();
-
+            
             sequence.Append((nut.PushAnimation(this)));
-            for (int i = nuts.Count - 1; i < gameConfig.MaxNutInTube; i++)
+            for (int i = nuts.Count ; i < gameConfig.MaxNutInTube; i++)
             {
                 Nut nutNext = tubeLast.PeekNuts();
                 if (nutNext == null)
@@ -96,7 +115,7 @@ public class Tube : MonoBehaviour
                 if (IsWin())
                 {
                     FinishTube();
-                    GameCtrl.instance.CompletedTube();
+                    CtrlPlay.instance.CompletedTube();
                 }
             });
             return true;

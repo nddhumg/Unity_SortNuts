@@ -4,9 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Random = UnityEngine.Random;
-#if UNITY_EDITOR
-public class RenderLevel : MonoBehaviour
+using UnityEditor;
+public class RenderLevel : Singleton<RenderLevel>
 {
+    private ColorEnum colorSelect;
+
     [Header("Info spawn")]
     [SerializeField, Range(3, 9)] private int countTube = 3;
     [SerializeField] private int countTubeFinish = 1;
@@ -14,7 +16,7 @@ public class RenderLevel : MonoBehaviour
     [SerializeField] private int countHiddenNut;
     [SerializeField] private int loopCount;
     [SerializeField] private int countTubeEmpty;
-    [SerializeField] private string level; 
+    [SerializeField] private string level;
 
 
     [Header("Info base")]
@@ -29,6 +31,31 @@ public class RenderLevel : MonoBehaviour
     [SerializeField] private GameObject tube;
     [SerializeField] private GameObject nut;
     private Vector3 positionNutCurrent;
+
+    public ColorEnum ColorSelect { set => colorSelect = value; }
+    [Button]
+    public GameObject SpawnMode() {
+        countTube = 9;
+        countTubeFinish = 9;
+        countColorFinish = 1;
+        countHiddenNut = 0;
+        loopCount = 0;
+        countTubeEmpty = 0;
+        Vector3 posiitionSpawn = new Vector3(boundLeftRight.x + size.x / 2, 0, boundTopDown.y + size.y / 2);
+        GameObject parentMap = new GameObject("Level" + level);
+        GameObject ctrlMap = new GameObject("Ctrl");
+        MapData mapdata = parentMap.AddComponent<MapData>();
+        ctrlMap.transform.parent = parentMap.transform;
+        parentMap.transform.position = new Vector3(0, positionYParent, 0);
+        mapdata.CountTubeFinish = countTubeFinish;
+        List<Tube> tubes = GenerateTube(parentMap, posiitionSpawn);
+        List<TubeRender> tubeRenders = Enumerable
+                                     .Range(0, countTube)
+                                     .Select(i => new TubeRender(configGame.MaxNutInTube, tubes[i]))
+                                     .ToList();
+        GenerateNut(tubeRenders);
+        return parentMap;
+    }
 
     [Button]
     public void Spawn()
@@ -49,6 +76,7 @@ public class RenderLevel : MonoBehaviour
         GenerateNut(tubeRenders);
 
     }
+#if UNITY_EDITOR
     [Button]
     public void SpawnDataCSV()
     {
@@ -83,7 +111,7 @@ public class RenderLevel : MonoBehaviour
         }
     }
 
-
+#endif
     protected List<Tube> GenerateTube(GameObject parentMap, Vector3 posiitionSpawn)
     {
         int index = 0;
@@ -92,7 +120,13 @@ public class RenderLevel : MonoBehaviour
         {
             for (int row = 0; row < maxRow && index != countTube; row++)
             {
-                GameObject tubeGO = Instantiate(tube);
+                GameObject tubeGO;
+#if UNITY_EDITOR
+                 tubeGO = (GameObject)PrefabUtility.InstantiatePrefab(tube);
+#else 
+                tubeGO = Instantiate(tube);
+#endif
+
                 tubeGO.transform.parent = parentMap.transform;
                 tubeGO.transform.localPosition = posiitionSpawn;
                 posiitionSpawn.x += size.x + spacing.x;
@@ -134,9 +168,18 @@ public class RenderLevel : MonoBehaviour
             nutRendersList.Reverse();
             foreach (NutRender nutRender in nutRendersList)
             {
-                GameObject nutGO = Instantiate(nut, tubeRenders[indexTubeRender].tube.NutsParent);
+                GameObject nutGO;
+                Tube tube = tubeRenders[indexTubeRender].tube;
+#if UNITY_EDITOR
+                 nutGO = (GameObject)PrefabUtility.InstantiatePrefab(nut);
+#else
+                nutGO = Instantiate(nut);
+#endif
+                nutGO.transform.parent = tube.NutsParent;
                 nutGO.transform.localPosition = positionNutCurrent;
                 Nut nutScript = nutGO.GetComponent<Nut>();
+                nutScript.Init(tube);
+                tube.ListAddNut(nutScript);
                 nutScript.SetColor(nutRender.color, configGame.GetMaterial(nutRender.color));
                 nutScript.SetupHidden(nutRender.isHidden, configGame.GetMaterialHidden());
                 positionNutCurrent.y += configGame.NutHeight / 2;
@@ -147,7 +190,7 @@ public class RenderLevel : MonoBehaviour
     protected void NormalizeData()
     {
         countTube = Mathf.Clamp(countTube, 3, 9);
-        countTubeFinish = Mathf.Clamp(countTubeFinish, 1, countTube-1);
+        countTubeFinish = Mathf.Clamp(countTubeFinish, 1, countTube - 1);
         ColorEnum[] allColors = (ColorEnum[])Enum.GetValues(typeof(ColorEnum));
         countColorFinish = Mathf.Clamp(countColorFinish, 1, allColors.Length);
         countHiddenNut = Mathf.Clamp(countHiddenNut, 0, 3);
@@ -243,4 +286,3 @@ public class RenderLevel : MonoBehaviour
         return colors;
     }
 }
-#endif

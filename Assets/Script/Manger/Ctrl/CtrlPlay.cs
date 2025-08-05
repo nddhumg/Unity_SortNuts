@@ -1,25 +1,36 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
-public class GameCtrl : Singleton<GameCtrl>
+
+public class CtrlPlay : Singleton<CtrlPlay>
 {
-    [SerializeField] private Nut nutSelect;
-    [SerializeField] private Tube tubeLast;
-    [SerializeField] private LayerMask layerTube;
-    [SerializeField] private float rayDistance = 20;
+    private Nut nutSelect;
+    private Tube tubeLast;
     private int countTubeComplerable;
     private int countTubeCompleted = 0;
     public Action OnWin;
+    [SerializeField] private LayerMask layerTube;
+    [SerializeField] private float rayDistance = 20;
     [SerializeField] private int levelCurrent;
-
+    [SerializeField] private string pathPrefabMap;
     private LevelManager levelManager;
 
-
-    [SerializeField] private string pathPrefabMap;
     public LevelManager LevelManager => levelManager;
-    void Update()
+    private void Update()
     {
-        ClickDetector();
+        if (Input.GetMouseButtonDown(0))
+        {
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;
+            Debug.DrawRay(ray.origin, ray.direction * rayDistance, Color.red, 0.5f);
+            if (Physics.Raycast(ray, out hit, rayDistance, layerTube))
+            {
+
+                Tube tubeSelect = hit.collider.GetComponent<Tube>();
+                SelectTube(tubeSelect);
+            }
+        }
     }
 
     protected override void Awake()
@@ -28,15 +39,11 @@ public class GameCtrl : Singleton<GameCtrl>
         levelManager = new(pathPrefabMap, levelCurrent);
     }
 
-    private void Start()
+    protected void Start()
     {
         levelManager.OnNextMap += OnNextMap;
     }
 
-    public void SetCountTubeFinish(int count)
-    {
-        countTubeComplerable += count;
-    }
 
     public void CompletedTube()
     {
@@ -47,7 +54,13 @@ public class GameCtrl : Singleton<GameCtrl>
         }
     }
 
-    private void OnNextMap() {
+    public void HandleClick(Tube tubeSelect)
+    {
+        SelectTube(tubeSelect);
+    }
+
+    private void OnNextMap()
+    {
         StartCoroutine(WaitForMapData(levelManager));
         countTubeCompleted = 0;
     }
@@ -57,21 +70,6 @@ public class GameCtrl : Singleton<GameCtrl>
         while (levelManager.MapCurrentData == null)
             yield return null;
         countTubeComplerable = levelManager.MapCurrentData.CountTubeFinish;
-    }
-
-    private void ClickDetector()
-    {
-        if (Input.GetMouseButtonDown(0))
-        {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit;
-            Debug.DrawRay(ray.origin, ray.direction * rayDistance, Color.red, 0.5f);
-            if (Physics.Raycast(ray, out hit, 100, layerTube))
-            {
-                Tube tubeSelect = hit.collider.GetComponent<Tube>();
-                SelectTube(tubeSelect);
-            }
-        }
     }
 
     private void SelectTube(Tube tubeSelect)
@@ -97,9 +95,5 @@ public class GameCtrl : Singleton<GameCtrl>
             return;
         }
         nutSelect = null;
-    }
-
-    private void SelectTubeTemp(Tube tubeSelect) {
-        
     }
 }
